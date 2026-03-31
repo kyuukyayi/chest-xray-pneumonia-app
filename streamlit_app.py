@@ -50,7 +50,18 @@ def load_model_assets():
         metadata = json.load(metadata_file)
 
     # Load the TorchScript model on the CPU so the app runs on normal Streamlit hosting.
-    model = torch.jit.load(str(SCRIPTED_MODEL_PATH), map_location="cpu")
+    import urllib.request
+import os
+
+MODEL_URL = "https://huggingface.co/Yayi1960/chest-xray-pneumonia-model/blob/main/best_model_scripted.pt"
+MODEL_PATH = "best_model_scripted.pt"
+
+# Download model only once
+if not os.path.exists(MODEL_PATH):
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+
+model = torch.jit.load(MODEL_PATH, map_location="cpu")
+model.eval()
     # Put the model into evaluation mode so dropout or batch norm stays stable.
     model.eval()
     # Return both the model and the metadata dictionary.

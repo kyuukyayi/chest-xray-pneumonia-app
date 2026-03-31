@@ -65,7 +65,7 @@ model.eval()
     # Put the model into evaluation mode so dropout or batch norm stays stable.
 model.eval()
     # Return both the model and the metadata dictionary.
-    return model, metadata
+return model, metadata
 
 # Define a preprocessing function that matches the training pipeline.
 def preprocess_image(image: Image.Image, image_size: int, mean: list[float], std: list[float]) -> torch.Tensor:

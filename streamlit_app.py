@@ -123,6 +123,27 @@ st.title("Chest X-Ray Pneumonia Detection Demo")
 st.write(
     "Upload a chest X-ray image and the model will predict whether it looks more like NORMAL or PNEUMONIA."
 )
+# Add an expandable section that describes the model and deployment
+with st.expander("About the Model and Deployment"):
+    st.markdown("""
+    ### Model Type
+    - Convolutional Neural Network (CNN)
+    - Architecture: **ResNet18**
+    - Training method: **Transfer Learning**
+    - Task: **Binary Classification (NORMAL vs PNEUMONIA)**
+
+    ### Deployment Format
+    - Model format: **TorchScript (.pt)**
+    - Interface: **Streamlit Web Application**
+    - Hosting: **Streamlit Community Cloud**
+    - Model storage: **Hugging Face (external hosting)**
+
+    ### Pipeline Overview
+    1. Upload chest X-ray image  
+    2. Image preprocessing (resize + normalization)  
+    3. Model inference (ResNet18)  
+    4. Prediction output with confidence score  
+    """)
 
 # Add an expandable note so your audience sees the model limitation.
 with st.expander("Important note"):

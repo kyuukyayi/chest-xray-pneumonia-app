@@ -63,7 +63,7 @@ if not os.path.exists(MODEL_PATH):
 model = torch.jit.load(MODEL_PATH, map_location="cpu")
 model.eval()
     # Put the model into evaluation mode so dropout or batch norm stays stable.
-    model.eval()
+model.eval()
     # Return both the model and the metadata dictionary.
     return model, metadata
 

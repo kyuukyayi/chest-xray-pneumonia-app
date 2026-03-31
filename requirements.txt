@@ -1,0 +1,10 @@
+# Install Streamlit so the web application can run.
+streamlit
+# Install PyTorch so the app can load and run the scripted model.
+torch
+# Install NumPy for image array processing.
+numpy
+# Install Pillow for reading uploaded image files.
+pillow
+# Install pandas for the probability table and chart data.
+pandas

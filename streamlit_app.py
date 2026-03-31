@@ -1,5 +1,9 @@
 # Import the json module so we can read the model metadata file.
 import json
+# Import the os module so we can check whether the model file already exists locally.
+import os
+# Import urllib.request so we can download the model file from Hugging Face.
+import urllib.request
 # Import Path so we can build file paths reliably.
 from pathlib import Path
 
@@ -18,10 +22,16 @@ from PIL import Image, UnidentifiedImageError
 BASE_DIR = Path(__file__).resolve().parent
 # Build the path to the models folder.
 MODEL_DIR = BASE_DIR / "models"
-# Build the path to the exported TorchScript model file.
-SCRIPTED_MODEL_PATH = MODEL_DIR / "best_model_scripted.pt"
+# Build the local path where the model file should be stored.
+MODEL_PATH = MODEL_DIR / "best_model_scripted.pt"
 # Build the path to the metadata JSON file.
-METADATA_PATH = MODEL_DIR / "model_metadata.json"
+METADATA_PATH = BASE_DIR / "model_metadata.json"
+
+# Store the direct downloadable URL for the model hosted on Hugging Face.
+MODEL_URL = "https://huggingface.co/Yayi1960/chest-xray-pneumonia-model/resolve/main/best_model_scripted.pt"
+
+# Create the models folder if it does not already exist.
+MODEL_DIR.mkdir(exist_ok=True)
 
 # Set the Streamlit page title, icon, and layout.
 st.set_page_config(page_title="Chest X-Ray Pneumonia Classifier", page_icon="ðŸ«", layout="centered")
@@ -30,19 +40,19 @@ st.set_page_config(page_title="Chest X-Ray Pneumonia Classifier", page_icon="ðŸ«
 @st.cache_resource
 # Start the model-loading function definition.
 def load_model_assets():
-    # Stop the app early if the scripted model file is missing.
-    if not SCRIPTED_MODEL_PATH.exists():
-        # Show a clear error message to the user.
-        st.error("The file models/best_model_scripted.pt was not found.")
-        # Stop Streamlit execution because the app cannot continue without the model.
-        st.stop()
-
     # Stop the app early if the metadata file is missing.
     if not METADATA_PATH.exists():
         # Show a clear error message to the user.
-        st.error("The file models/model_metadata.json was not found.")
+        st.error("The file model_metadata.json was not found in the app folder.")
         # Stop Streamlit execution because the app cannot continue without metadata.
         st.stop()
+
+    # Download the model file if it is not already stored locally.
+    if not MODEL_PATH.exists():
+        # Show a small informational message while the model is downloading.
+        st.info("Downloading model file. Please wait...")
+        # Download the model file from Hugging Face to the local models folder.
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
     # Open the metadata JSON file for reading.
     with open(METADATA_PATH, "r", encoding="utf-8") as metadata_file:
@@ -50,22 +60,11 @@ def load_model_assets():
         metadata = json.load(metadata_file)
 
     # Load the TorchScript model on the CPU so the app runs on normal Streamlit hosting.
-    import urllib.request
-import os
-
-MODEL_URL = "https://huggingface.co/Yayi1960/chest-xray-pneumonia-model/blob/main/best_model_scripted.pt"
-MODEL_PATH = "best_model_scripted.pt"
-
-# Download model only once
-if not os.path.exists(MODEL_PATH):
-    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-
-model = torch.jit.load(MODEL_PATH, map_location="cpu")
-model.eval()
+    model = torch.jit.load(str(MODEL_PATH), map_location="cpu")
     # Put the model into evaluation mode so dropout or batch norm stays stable.
-model.eval()
+    model.eval()
     # Return both the model and the metadata dictionary.
-return model, metadata
+    return model, metadata
 
 # Define a preprocessing function that matches the training pipeline.
 def preprocess_image(image: Image.Image, image_size: int, mean: list[float], std: list[float]) -> torch.Tensor:

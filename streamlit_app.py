@@ -118,7 +118,7 @@ def predict_image(image: Image.Image, model, metadata: dict):
     return predicted_label, confidence, probabilities.numpy().tolist()
 
 # Write the main title at the top of the app.
-st.title("Chest X-Ray Pneumonia Detection Demo")
+st.title("🫁Chest X-Ray Pneumonia Detection Demo")
 # Add a short description below the title.
 st.write(
     "Upload a chest X-ray image and the model will predict whether it looks more like NORMAL or PNEUMONIA."
